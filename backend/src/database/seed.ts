@@ -41,8 +41,6 @@ export async function seedDatabase() {
 
     await client.query(sql, params)
   }
-
-  console.log(data)
 }
 
 seedDatabase()
