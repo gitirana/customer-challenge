@@ -13,7 +13,7 @@ export async function listCustomersQuery({
   name,
   phone,
 }: listCustomersFilters) {
-  const limit = 1
+  const limit = 10
   const offset = (page - 1) * limit
   const pageNumber = page ? parseInt(page.toString(), 10) : 1
 
