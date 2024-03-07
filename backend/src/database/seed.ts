@@ -1,4 +1,5 @@
-import { faker } from '@faker-js/faker'
+import { fakerPT_BR as faker } from '@faker-js/faker'
+import cuid from 'cuid'
 import { Pool } from 'pg'
 
 const pool = new Pool({
@@ -36,8 +37,12 @@ export async function seedDatabase() {
   const data = await generateRandomCustomers(100)
 
   for (const seed of data) {
-    const sql = `INSERT INTO customers (name, email, phone) VALUES ($1, $2, $3)`
-    const params = [seed.name, seed.email, seed.phone]
+    const id = cuid()
+
+    const sql = `
+    INSERT INTO customers (id, name, email, phone) VALUES ($1, $2, $3, $4) RETURNING *
+  `
+    const params = [id, seed.name, seed.email, seed.phone]
 
     await client.query(sql, params)
   }
@@ -45,7 +50,7 @@ export async function seedDatabase() {
 
 seedDatabase()
   .then(() => {
-    console.log('processo feito')
+    console.log('✅ Seed completo')
     process.exit(0)
   })
   .catch((error) => {
