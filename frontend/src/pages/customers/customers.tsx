@@ -1,10 +1,10 @@
-import { UserRoundPlus } from 'lucide-react'
-import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
+import { useSearchParams } from 'react-router-dom'
+import { z } from 'zod'
 
+import { getCustomers } from '@/api/get-customers'
 import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -13,31 +13,49 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { CustomerRegistration } from './customer-registration'
 import { CustomerTableFilters } from './customer-table-filters'
 import { CustomerTableRow } from './customer-table-row'
+import { CustomersHeader } from './customers-header'
 
 export function Customers() {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const id = searchParams.get('id')
+  const name = searchParams.get('name')
+  const email = searchParams.get('email')
+  const phone = searchParams.get('phone')
+
+  const page = z.coerce
+    .number()
+    .transform((page) => page - 1)
+    .parse(searchParams.get('page') ?? '1')
+
+  const { data: result } = useQuery({
+    queryKey: ['customers', page, id, name, email, phone],
+    queryFn: () =>
+      getCustomers({
+        id,
+        email,
+        name,
+        page,
+        phone,
+      }),
+  })
+
+function handlePaginate(pageIndex: number) {
+  setSearchParams((prev) => {
+    prev.set('page', (pageIndex + 1).toString())
+
+    return prev
+  })
+}
 
   return (
     <>
       <Helmet title="Customers" />
 
       <div className="flex flex-col gap-4">
-        <header className="flex justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
-          <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <UserRoundPlus className="h-4 w-4" />
-                Novo cliente
-              </Button>
-            </DialogTrigger>
-
-            <CustomerRegistration />
-          </Dialog>
-        </header>
+        <CustomersHeader />
 
         <main className="space-y-2.5">
           <CustomerTableFilters />
@@ -56,14 +74,22 @@ export function Customers() {
               </TableHeader>
 
               <TableBody>
-                {Array.from({ length: 10 }).map((_, index) => {
-                  return <CustomerTableRow key={index} />
-                })}
+                {result &&
+                  result.customers.map((customer, index) => {
+                    return <CustomerTableRow key={index} customer={customer} />
+                  })}
               </TableBody>
             </Table>
           </div>
 
-          <Pagination pageIndex={0} totalCount={105} perPage={10} />
+          {result && (
+            <Pagination
+              onPageChange={handlePaginate}
+              pageIndex={result.meta.page}
+              totalCount={result.meta.totalCount}
+              perPage={result.meta.perPage}
+            />
+          )}
         </main>
       </div>
     </>

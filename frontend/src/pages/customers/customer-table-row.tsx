@@ -1,15 +1,20 @@
+import { formatDistanceToNow } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
+import { Customer } from '@/api/get-customers'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
 
 import { CustomerDetails } from './customer-details'
 
-// export interface CustomerTableRowProps {}
+export interface CustomerTableRowProps {
+  customer: Customer
+}
 
-export function CustomerTableRow() {
+export function CustomerTableRow({ customer }: CustomerTableRowProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   return (
@@ -23,19 +28,22 @@ export function CustomerTableRow() {
             </Button>
           </DialogTrigger>
 
-          <CustomerDetails />
+          <CustomerDetails customer={customer} open={true} />
         </Dialog>
       </TableCell>
 
       <TableCell className="font-mono text-xs font-medium">
-        3029701473740127430sf
+        {customer.id}
       </TableCell>
-      <TableCell className="text-muted-foreground">há 15min</TableCell>
-      <TableCell className="font-medium">
-        Thayná Luiza Gitirana da Cunha
+      <TableCell className="text-muted-foreground">
+        {formatDistanceToNow(customer.created_at, {
+          locale: ptBR,
+          addSuffix: true,
+        })}
       </TableCell>
-      <TableCell className="font-medium">thayna@email.com</TableCell>
-      <TableCell className="font-medium">(81) 98843-6241</TableCell>
+      <TableCell className="font-medium">{customer.name}</TableCell>
+      <TableCell className="font-medium">{customer.email}</TableCell>
+      <TableCell className="font-medium">{customer.phone}</TableCell>
     </TableRow>
   )
 }

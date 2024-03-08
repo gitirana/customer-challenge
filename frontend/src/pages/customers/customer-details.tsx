@@ -1,3 +1,4 @@
+import { Customer } from '@/api/get-customers'
 import {
   DialogContent,
   DialogDescription,
@@ -5,16 +6,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { formatDistanceToNow } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 export interface CustomerDetailsProps {
   open: boolean
+  customer: Customer
 }
 
-export function CustomerDetails() {
+export function CustomerDetails({customer}: CustomerDetailsProps) {
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Cliente: 3029701473740127430sf</DialogTitle>
+        <DialogTitle>Cliente: {customer.id}</DialogTitle>
         <DialogDescription>Detalhes do cliente</DialogDescription>
       </DialogHeader>
 
@@ -24,27 +28,30 @@ export function CustomerDetails() {
             <TableRow>
               <TableCell className="text-muted-foreground">Cliente</TableCell>
               <TableCell className="flex justify-end">
-                Thayná Luiza Gitirana da Cunha
+                {customer.name}
               </TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell className="text-muted-foreground">Telefone</TableCell>
               <TableCell className="flex justify-end">
-                (81) 98843-6241
+                {customer.phone}
               </TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell className="text-muted-foreground">E-mail</TableCell>
               <TableCell className="flex justify-end">
-                thayna@email.com
+                {customer.email}
               </TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell className="text-muted-foreground">Criado há</TableCell>
-              <TableCell className="flex justify-end">15min</TableCell>
+              <TableCell className="flex justify-end">{formatDistanceToNow(customer.created_at, {
+                locale: ptBR,
+                addSuffix: true,
+              })}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

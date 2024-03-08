@@ -1,4 +1,4 @@
-import { MapPin, Scale, UsersRound } from 'lucide-react'
+import { Scale, UsersRound } from 'lucide-react'
 
 import { NavLink } from './nav-link'
 import { ThemeToggle } from './theme/theme-toggle'
@@ -16,11 +16,6 @@ export function Header() {
           <NavLink to="/">
             <UsersRound className="h-4 w-4" />
             Clientes
-          </NavLink>
-
-          <NavLink to="/route">
-            <MapPin className="h-4 w-4" />
-            Cálculo de rota
           </NavLink>
         </nav>
 
